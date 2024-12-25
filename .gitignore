@@ -1,3 +1,8 @@
+.venv/
+*.csv  # If you don't want to commit large data files
+*.pyc
+*.DS_Store # macOS specific
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -31,6 +36,8 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+
+
 
 # Installer logs
 pip-log.txt
