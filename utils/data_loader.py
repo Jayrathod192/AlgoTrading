@@ -25,4 +25,14 @@ def load_data_from_csv(filepath):
         print(f"Error loading CSV: {e}")
         return None
 
+def load_intraday_data(ticker, period="5d", interval="1h"):  # 1-day range, 1-minute intervals
+    try:
+        data = yf.download(tickers=ticker, period=period, interval=interval)
+        if data.empty:
+            raise ValueError(f"No data found for ticker: {ticker}")
+        return data
+    except Exception as e:
+        print(f"Error downloading data: {e}")
+        return None
+
 # ... other data loading/preprocessing functions ...
