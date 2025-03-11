@@ -16,6 +16,8 @@ class SmaCross(bt.Strategy):
         self.sma_main = bt.indicators.EMA(self.datas[0], period=self.p.main)
         self.cross = bt.indicators.CrossOver(self.sma_fast, self.sma_slow)
         self.order = None  # To keep track of pending orders
+        self.sl = None
+        self.target = None
 
     def next(self):
         if self.order:  # Check if an order is pending
@@ -29,7 +31,7 @@ class SmaCross(bt.Strategy):
         lower_wick = abs(self.low[0] - self.sma_fast[0])
 
         if self.position.size > 0:  # In a long position
-            if self.dataclose[0] < self.sma_slow[0]:
+            if self.dataclose[0] < self.sma_slow[0] or self.dataclose[0] <= self.sl: #or self.dataclose[0] >= self.target:
                 self.log('SELL CREATE (Long Exit), %.2f' % self.dataclose[0])
                 self.order = self.close()
 
@@ -40,16 +42,23 @@ class SmaCross(bt.Strategy):
 
         elif not self.position:  # Not in any position
             # Long Entry
-            if self.dataclose[0] > self.sma_main and self.sma_slow > self.sma_main and self.sma_fast > self.sma_slow:
-                if self.cross > 0:# and self.low <= self.sma_fast and self.high > self.sma_fast:
-                    # Green candle with small wicks near fast MA
-                    self.log('BUY CREATE (Long Entry), %.2f' % self.dataclose[0])
-                    self.order = self.buy()
+            # Long Entry Condition
+            if self.dataclose[0] > self.sma_main[0] and self.sma_fast[0] > self.sma_slow[0] and self.sma_slow[0] > self.sma_main[0]:
+                # Ensure price is above the 21 EMA and the EMAs are in correct order (21 > 50 > 200)
+                if self.low[0] <= self.sma_fast[0] and self.dataclose[0] > self.sma_fast[0]:
 
-            # Short Entry
-            elif self.dataclose[0] < self.sma_main and self.sma_slow < self.sma_main and self.sma_fast < self.sma_slow:
-                if self.cross < 0:# and self.low >= self.sma_fast and self.low < self.sma_fast:
-                    # Red candle with small wicks near fast MA
+                    self.sl = self.low[0]
+                    self.target = self.high[0] + (2 * (self.high[0] - self.sl))
+
+                    self.log('BUY CREATE (Long Entry), %.2f' % self.high[0])
+                    self.order = self.buy(
+                        price=self.high[0],
+                        trailpercent = 1)
+
+            # Short Entry Condition
+            elif self.dataclose[0] > self.sma_main[0] and self.sma_fast[0] < self.sma_slow[0] and self.sma_slow[0] < self.sma_main[0]:
+                # Ensure price is above the 200 EMA and the EMAs are in correct order (21 < 50 < 200)
+                if self.high[0] >= self.sma_fast[0] and self.dataclose[0] < self.sma_fast[0]:
                     self.log('SELL CREATE (Short Entry), %.2f' % self.dataclose[0])
                     self.order = self.sell()
 
@@ -64,7 +73,7 @@ class SmaCross(bt.Strategy):
             if order.isbuy():
                 self.log(
                     'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
-                    (order.executed.price,
+                    (order.price,
                      order.executed.value,
                      order.executed.comm))
 
