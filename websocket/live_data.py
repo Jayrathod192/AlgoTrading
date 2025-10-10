@@ -1,6 +1,7 @@
 from fyers_apiv3.FyersWebsocket import data_ws
 
-
+# 52GVUJ17IH-100:5MRCIRG0MM
+# 93a0ba73aee327719a887987d4718b587bfa0e346018593929567b0452d0912b
 def onmessage(message):
     """
     Callback function to handle incoming messages from the FyersDataSocket WebSocket.
@@ -40,7 +41,7 @@ def onopen():
     data_type = "SymbolUpdate"
 
     # Subscribe to the specified symbols and data type
-    symbols = ['NSE:SBIN-EQ', 'NSE:ADANIENT-EQ']
+    symbols = ['NSE:NIFTY50-INDEX']
     fyers.subscribe(symbols=symbols, data_type=data_type)
 
     # Keep the socket running to receive real-time data
@@ -48,7 +49,7 @@ def onopen():
 
 
 # Replace the sample access token with your actual access token obtained from Fyers
-access_token ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuZnllcnMuaW4iLCJpYXQiOjE3MzY1OTU3NzcsImV4cCI6MTczNjY0MTg1NywibmJmIjoxNzM2NTk1Nzc3LCJhdWQiOlsieDowIiwieDoxIiwieDoyIiwiZDoxIiwiZDoyIiwieDoxIiwieDowIl0sInN1YiI6ImFjY2Vzc190b2tlbiIsImF0X2hhc2giOiJnQUFBQUFCbmdsbEJxTll3VGM2bWJZVE5BXzQ0djNKWm82d1pLV19YbDBBQWFqbmVpR0t2cEw2R2RkR3l4SklVRU43d3B2ZGE5cUFrLW5LQ2dsbmhkbHhQTFB3dUFrYWRqZk1TU1dxbld2bDUyc3hWZEpYdTVvRT0iLCJkaXNwbGF5X25hbWUiOiJSYXRob2QgSmlnbmVzaCIsIm9tcyI6IksxIiwiaHNtX2tleSI6IjczMzRmNzdmZmVmMWNhMGM0Yzk4Njc3OGFiY2ZlOTJjM2RkYTc2YTU2ODlmYTc4YzZlNWY5YTYzIiwiZnlfaWQiOiJYUjIwMzI2IiwiYXBwVHlwZSI6MTAwLCJwb2FfZmxhZyI6Ik4ifQ.xtpEp3192i9SKk8RLh1lS-UUukACypFBlXozHHmCT8U"
+access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiZDoxIiwiZDoyIiwieDowIiwieDoxIiwieDoyIl0sImF0X2hhc2giOiJnQUFBQUFCbzZHMl9iYzVrZk93cHFPNC1JTjl3QndVOEx0WHRlMndzcVE0RGxFX1ROVFRJZTRqRUxhRDhpOFVmb01wZms4MWswNkJZYjU0YVo3N2Z2RDg5MlNqZk80UU82a25qUGYyYmZDLUlPSU1iTzJaRXZEST0iLCJkaXNwbGF5X25hbWUiOiIiLCJvbXMiOiJLMSIsImhzbV9rZXkiOiI1ZDc5ZjMzMDk4NzVjYzhlOGRhMDJlMjVhMTk3Y2QzMmJmMDlmN2UzNGMyNDNhZjI2ZWJmYmZmZiIsImlzRGRwaUVuYWJsZWQiOiJOIiwiaXNNdGZFbmFibGVkIjoiTiIsImZ5X2lkIjoiWFIyMDMyNiIsImFwcFR5cGUiOjEwMCwiZXhwIjoxNzYwMTQyNjAwLCJpYXQiOjE3NjAwNjI5MTEsImlzcyI6ImFwaS5meWVycy5pbiIsIm5iZiI6MTc2MDA2MjkxMSwic3ViIjoiYWNjZXNzX3Rva2VuIn0.67bB-aeqJyYj4fSELmOZrRqX27inZszwhPiP2VnQnp8'
 # Create a FyersDataSocket instance with the provided parameters
 fyers = data_ws.FyersDataSocket(
     access_token=access_token,       # Access token in the format "appid:accesstoken"
@@ -61,6 +62,9 @@ fyers = data_ws.FyersDataSocket(
     on_error=onerror,                # Callback function to handle WebSocket errors.
     on_message=onmessage             # Callback function to handle incoming messages from the WebSocket.
 )
+
+fyers.setQueueProcessInterval(30000)  #// 200ms - more reasonable interval for queue processing
+
 
 
 

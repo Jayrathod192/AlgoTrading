@@ -6,16 +6,21 @@ def get_historical_data(ticker, start_date, end_date):
     """Downloads historical data from Yahoo Finance."""
     try:
         data = yf.download(ticker, start=start_date, end=end_date)
-        #data = yf.download("AMZN AAPL GOOG", start="2023-01-01", end="2023-12-30")
-
-        # Flatten the MultiIndex by taking the second level ('AAPL') and renaming the columns
-        data.columns = [col[0] for col in data.columns]  # Extract 'Close', 'High', 'Low', 'Open', 'Volume'
-
-        # Rename columns to match Backtrader's expected format
-        data.columns = ['Close', 'High', 'Low', 'open', 'volume']
-
         if data.empty:
             raise ValueError(f"No data found for ticker: {ticker}")
+
+        # Rename columns to match Backtrader expectations
+        data.rename(columns={
+            'Open': 'open',
+            'High': 'high',
+            'Low': 'low',
+            'Close': 'close',
+            'Volume': 'volume'
+        }, inplace=True)
+
+        data = data[['open', 'high', 'low', 'close', 'volume']]  # drop Adj Close
+
+        data.index.name = 'datetime'
         return data
     except Exception as e:
         print(f"Error downloading data: {e}")
