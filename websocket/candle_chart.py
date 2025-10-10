@@ -1,6 +1,3 @@
-import matplotlib
-matplotlib.use('TkAgg')  # Set backend before importing pyplot
-
 from fyers_apiv3.FyersWebsocket import data_ws
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -219,7 +216,7 @@ class FyersCandleChart:
                 self.ax1.set_xlim(-0.5, len(all_candles) - 0.5)
                 self.ax2.set_xlim(-0.5, len(all_candles) - 0.5)
 
-            # Auto-scale y-axis with padding
+            # Auto-scale y-axis based on previous close and price range
             if all_candles:
                 all_highs = [c['high'] for c in all_candles if c['high'] > 0]
                 all_lows = [c['low'] for c in all_candles if c['low'] > 0]
@@ -227,7 +224,17 @@ class FyersCandleChart:
                 if all_highs and all_lows:
                     y_min = min(all_lows)
                     y_max = max(all_highs)
-                    padding = (y_max - y_min) * 0.1
+
+                    # Include previous close in the range if available
+                    if self.prev_close > 0:
+                        y_min = min(y_min, self.prev_close)
+                        y_max = max(y_max, self.prev_close)
+
+                    # Calculate padding
+                    price_range = y_max - y_min
+                    padding = max(price_range * 0.05, 10)  # At least 10 points padding
+
+                    # Set limits based on price action, not starting from 0
                     self.ax1.set_ylim(y_min - padding, y_max + padding)
 
             try:
